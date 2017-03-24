@@ -174,6 +174,8 @@ SET(QGIS_APP_SRCS
   pluginmanager/qgspluginsortfilterproxymodel.cpp
   pluginmanager/qgspluginitemdelegate.cpp
 
+  geonode/qgsgeonodesourceselect.cpp
+
   qgsnewspatialitelayerdialog.cpp
 
   qgssettingstree.cpp
@@ -343,6 +345,8 @@ SET (QGIS_APP_MOC_HDRS
   pluginmanager/qgsapppluginmanagerinterface.h
   pluginmanager/qgspluginsortfilterproxymodel.h
   pluginmanager/qgspluginitemdelegate.h
+
+  geonode/qgsgeonodesourceselect.h
 
   qgsnewspatialitelayerdialog.h
 
@@ -569,6 +573,7 @@ INCLUDE_DIRECTORIES(
   openstreetmap
   dwg
   dwg/libdxfrw
+  geonode
 )
 INCLUDE_DIRECTORIES(SYSTEM
   ${SPATIALITE_INCLUDE_DIR}

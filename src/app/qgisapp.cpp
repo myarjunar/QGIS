@@ -784,9 +784,9 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
 
   endProfile();
 
+  functionProfile( &QgisApp::createMenus, this, QStringLiteral( "Create menus" ) );
   functionProfile( &QgisApp::createActions, this, QStringLiteral( "Create actions" ) );
   functionProfile( &QgisApp::createActionGroups, this, QStringLiteral( "Create action group" ) );
-  functionProfile( &QgisApp::createMenus, this, QStringLiteral( "Create menus" ) );
   functionProfile( &QgisApp::createToolBars, this, QStringLiteral( "Toolbars" ) );
   functionProfile( &QgisApp::createStatusBar, this, QStringLiteral( "Status bar" ) );
   functionProfile( &QgisApp::createCanvasTools, this, QStringLiteral( "Create canvas tools" ) );
@@ -1010,7 +1010,6 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
 
   // add geonode menu under web menu
   mWebMenu->addMenu( mGeonodeMenu );
-  mActionAddGeonodeLayer = new QAction( tr( "Add GeoNode Layers..." ), this );
   mGeonodeMenu->addAction( mActionAddGeonodeLayer );
 
   // Set icon size of toolbars
@@ -2090,6 +2089,8 @@ void QgisApp::createMenus()
   // Geonode Submenu
   mGeonodeMenu = new QMenu( tr( "GeoNode" ), this );
   mGeonodeMenu->setObjectName( QStringLiteral( "mGeonodeMenu" ) );
+  // Geonode Action
+  mActionAddGeonodeLayer = new QAction( tr( "Add GeoNode Layers..." ), this );
 
   // Get platform for menu layout customization (Gnome, Kde, Mac, Win)
   QDialogButtonBox::ButtonLayout layout =
@@ -4368,7 +4369,14 @@ void QgisApp::askUserForOGRSublayers( QgsVectorLayer *layer )
 
 void QgisApp::addGeonodeLayer()
 {
-
+  QgsGeonodeSourceSelect *geonodes = new QgsGeonodeSourceSelect( this, 0, true );
+  if ( !geonodes )
+  {
+    QMessageBox::warning( this, tr( "Geonode" ), tr( "Cannot get Geonode select dialog." ) );
+    return;
+  }
+  geonodes->exec();
+  delete geonodes;
 }
 
 void QgisApp::addDatabaseLayer()
