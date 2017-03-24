@@ -392,6 +392,9 @@ class APP_EXPORT QgisAppInterface : public QgisInterface
     virtual QAction *actionShowBookmarks() override;
     virtual QAction *actionDraw() override;
 
+    //! Web menu actions
+    virtual QAction *actionAddGeonodeLayer();
+
     //! Layer menu actions
     virtual QAction *actionNewVectorLayer() override;
     virtual QAction *actionAddOgrLayer() override;

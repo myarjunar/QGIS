@@ -269,6 +269,7 @@
 #include "qgshelp.h"
 #include "qgsvectorfilewritertask.h"
 #include "qgsnewnamedialog.h"
+#include "qgsgeonodesourceselect.h"
 
 #include "qgssublayersdialog.h"
 #include "ogr/qgsopenvectorlayerdialog.h"
@@ -1006,6 +1007,11 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
     mActionShowPythonDialog = nullptr;
     mActionInstallFromZip = nullptr;
   }
+
+  // add geonode menu under web menu
+  mWebMenu->addMenu( mGeonodeMenu );
+  mActionAddGeonodeLayer = new QAction( tr( "Add GeoNode Layers..." ), this );
+  mGeonodeMenu->addAction( mActionAddGeonodeLayer );
 
   // Set icon size of toolbars
   int size = settings.value( QStringLiteral( "IconSize" ), QGIS_ICON_SIZE ).toInt();
@@ -1782,6 +1788,10 @@ void QgisApp::createActions()
   connect( mActionLabeling, &QAction::triggered, this, &QgisApp::labeling );
   connect( mActionStatisticalSummary, &QAction::triggered, this, &QgisApp::showStatisticsDockWidget );
 
+  // Web Menu Items
+
+  connect( mActionAddGeonodeLayer, &QAction::triggered, this, &QgisApp::addGeonodeLayer );
+
   // Layer Menu Items
 
   connect( mActionNewVectorLayer, &QAction::triggered, this, &QgisApp::newVectorLayer );
@@ -2076,6 +2086,10 @@ void QgisApp::createMenus()
   mPanelMenu->setObjectName( QStringLiteral( "mPanelMenu" ) );
   mToolbarMenu = new QMenu( tr( "Toolbars" ), this );
   mToolbarMenu->setObjectName( QStringLiteral( "mToolbarMenu" ) );
+
+  // Geonode Submenu
+  mGeonodeMenu = new QMenu( tr( "GeoNode" ), this );
+  mGeonodeMenu->setObjectName( QStringLiteral( "mGeonodeMenu" ) );
 
   // Get platform for menu layout customization (Gnome, Kde, Mac, Win)
   QDialogButtonBox::ButtonLayout layout =
@@ -4350,6 +4364,11 @@ void QgisApp::askUserForOGRSublayers( QgsVectorLayer *layer )
         group->addLayer( l );
     }
   }
+}
+
+void QgisApp::addGeonodeLayer()
+{
+
 }
 
 void QgisApp::addDatabaseLayer()
