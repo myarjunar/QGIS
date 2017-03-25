@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/src/core/auth
   ${CMAKE_SOURCE_DIR}/src/core/composer
   ${CMAKE_SOURCE_DIR}/src/core/geometry
+  ${CMAKE_SOURCE_DIR}/src/core/geonode
   ${CMAKE_SOURCE_DIR}/src/core/effects
   ${CMAKE_SOURCE_DIR}/src/core/layertree
   ${CMAKE_SOURCE_DIR}/src/core/processing
@@ -139,6 +140,7 @@ ADD_QGIS_TEST(fontmarkertest2 testqgsfontmarker.cpp)
 ADD_QGIS_TEST(geometryimporttest testqgsgeometryimport.cpp)
 ADD_QGIS_TEST(geometrytest testqgsgeometry.cpp)
 ADD_QGIS_TEST(geometryutilstest testqgsgeometryutils.cpp)
+ADD_QGIS_TEST(geonodeconnectiontest testqgsgeonodeconnection.cpp)
 ADD_QGIS_TEST(gmltest testqgsgml.cpp)
 ADD_QGIS_TEST(gradienttest testqgsgradients.cpp )
 ADD_QGIS_TEST(graduatedsymbolrenderertest testqgsgraduatedsymbolrenderer.cpp)
