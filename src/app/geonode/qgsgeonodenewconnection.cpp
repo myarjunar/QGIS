@@ -12,7 +12,7 @@
 #include "qgsgeonodeconnection.h"
 #include "qgssettings.h"
 
-QgsGeoNodeNewConnection::QgsGeoNodeNewConnection(QWidget *parent, const QString &connName, Qt::WindowFlags fl)
+QgsGeoNodeNewConnection::QgsGeoNodeNewConnection( QWidget *parent, const QString &connName, Qt::WindowFlags fl )
   : QDialog( parent, fl )
   , mOriginalConnName( connName )
   , mAuthConfigSelect( nullptr )
@@ -51,6 +51,10 @@ QgsGeoNodeNewConnection::QgsGeoNodeNewConnection(QWidget *parent, const QString 
   int w = width();
   adjustSize();
   resize( w, height() );
+
+  buttonBox->button( QDialogButtonBox::Ok )->setDisabled( true );
+  connect( txtName, SIGNAL( textChanged( QString ) ), this, SLOT( okButtonBehavior( QString ) ) );
+  connect( txtUrl, SIGNAL( textChanged( QString ) ), this, SLOT( okButtonBehavior( QString ) ) );
 }
 
 void QgsGeoNodeNewConnection::accept()
@@ -101,14 +105,9 @@ void QgsGeoNodeNewConnection::accept()
   QDialog::accept();
 }
 
-void QgsGeoNodeNewConnection::on_txtName_textChanged( const QString &text )
+void QgsGeoNodeNewConnection::okButtonBehavior( const QString &text )
 {
   Q_UNUSED( text );
   buttonBox->button( QDialogButtonBox::Ok )->setDisabled( txtName->text().isEmpty() || txtUrl->text().isEmpty() );
-}
-
-void QgsGeoNodeNewConnection::on_txtUrl_textChanged( const QString &text )
-{
-  Q_UNUSED( text );
-  buttonBox->button( QDialogButtonBox::Ok )->setDisabled( txtName->text().isEmpty() || txtUrl->text().isEmpty() );
+  buttonBox->button( QDialogButtonBox::Ok )->setEnabled( !txtName->text().isEmpty() && !txtUrl->text().isEmpty() );
 }

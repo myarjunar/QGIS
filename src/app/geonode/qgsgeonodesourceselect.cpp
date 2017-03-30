@@ -45,12 +45,7 @@ QgsGeoNodeSourceSelect::QgsGeoNodeSourceSelect( QWidget *parent, Qt::WindowFlags
   mAddButton = new QPushButton( tr( "&Add" ) );
   mAddButton->setEnabled( false );
 
-  mBuildQueryButton = new QPushButton( tr( "&Build query" ) );
-  mBuildQueryButton->setToolTip( tr( "Build query" ) );
-  mBuildQueryButton->setDisabled( true );
-
   buttonBox->addButton( mAddButton, QDialogButtonBox::ActionRole );
-  buttonBox->addButton( mBuildQueryButton, QDialogButtonBox::ActionRole );
 
   populateConnectionList();
 
@@ -59,6 +54,8 @@ QgsGeoNodeSourceSelect::QgsGeoNodeSourceSelect( QWidget *parent, Qt::WindowFlags
   connect( btnEdit, SIGNAL( clicked() ), this, SLOT( modifyConnectionsEntryList() ) );
   connect( btnDelete, SIGNAL( clicked() ), this, SLOT( deleteConnectionsEntryList() ) );
   connect( btnConnect, SIGNAL( clicked() ), this, SLOT( connectToGeonodeConnection() ) );
+  connect( btnSave, SIGNAL( clicked() ), this, SLOT( saveGeonodeConnection() ) );
+  connect( btnLoad, SIGNAL( clicked() ), this, SLOT( loadGeonodeConnection() ) );
   connect( lineFilter, SIGNAL( textChanged( QString ) ), this, SLOT( filterChanged( QString ) ) );
 
   mItemDelegate = new QgsGeonodeItemDelegate( treeView );
@@ -236,13 +233,13 @@ void QgsGeoNodeSourceSelect::connectToGeonodeConnection()
   }
 }
 
-void QgsGeoNodeSourceSelect::on_btnSave_clicked()
+void QgsGeoNodeSourceSelect::saveGeonodeConnection()
 {
   QgsManageConnectionsDialog dlg( this, QgsManageConnectionsDialog::Export, QgsManageConnectionsDialog::GeoNode );
   dlg.exec();
 }
 
-void QgsGeoNodeSourceSelect::on_btnLoad_clicked()
+void QgsGeoNodeSourceSelect::loadGeonodeConnection()
 {
   QString fileName = QFileDialog::getOpenFileName( this, tr( "Load connections" ), QDir::homePath(),
                      tr( "XML files (*.xml *XML)" ) );

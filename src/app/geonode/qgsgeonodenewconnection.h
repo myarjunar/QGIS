@@ -23,9 +23,7 @@ class QgsGeoNodeNewConnection : public QDialog, private Ui::QgsNewGeoNodeConnect
 
   public slots:
     void accept() override;
-    void on_txtName_textChanged( const QString & );
-    void on_txtUrl_textChanged( const QString & );
-    void on_buttonBox_helpRequested() { QgsHelp::openHelp( QStringLiteral( "working_with_vector/supported_data.html#postgis-layers" ) ); }
+    void okButtonBehavior( const QString & );
 
   private:
     QString mBaseKey;

@@ -63,8 +63,8 @@ class QgsGeoNodeSourceSelect: public QDialog, private Ui::QgsGeonodeSourceSelect
     void modifyConnectionsEntryList();
     void deleteConnectionsEntryList();
     void connectToGeonodeConnection();
-    void on_btnSave_clicked();
-    void on_btnLoad_clicked();
+    void saveGeonodeConnection();
+    void loadGeonodeConnection();
     void filterChanged( const QString &text );
 
     void populateConnectionList();
