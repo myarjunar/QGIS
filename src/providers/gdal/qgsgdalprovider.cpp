@@ -3057,7 +3057,7 @@ class QgsGdalRasterSourceSelectProvider : public QgsSourceSelectProvider
 
     virtual QString providerKey() const override { return QStringLiteral( "gdal" ); }
     virtual QString text() const override { return QObject::tr( "Raster" ); }
-    virtual int ordering() const override { return 20; }
+    virtual int ordering() const override { return QgsSourceSelectProvider::OrderLocalProvider + 20; }
     virtual QIcon icon() const override { return QgsApplication::getThemeIcon( QStringLiteral( "/mActionAddRasterLayer.svg" ) ); }
     virtual QgsAbstractDataSourceWidget *createDataSourceWidget( QWidget *parent = nullptr, Qt::WindowFlags fl = Qt::Widget, QgsProviderRegistry::WidgetMode widgetMode = QgsProviderRegistry::WidgetMode::Embedded ) const override
     {

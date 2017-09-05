@@ -1207,7 +1207,7 @@ class QgsDelimitedTextSourceSelectProvider : public QgsSourceSelectProvider
 
     virtual QString providerKey() const override { return QStringLiteral( "delimitedtext" ); }
     virtual QString text() const override { return QObject::tr( "Delimited Text" ); }
-    virtual int ordering() const override { return 30; }
+    virtual int ordering() const override { return QgsSourceSelectProvider::OrderLocalProvider + 30; }
     virtual QIcon icon() const override { return QgsApplication::getThemeIcon( QStringLiteral( "/mActionAddDelimitedTextLayer.svg" ) ); }
     virtual QgsAbstractDataSourceWidget *createDataSourceWidget( QWidget *parent = nullptr, Qt::WindowFlags fl = Qt::Widget, QgsProviderRegistry::WidgetMode widgetMode = QgsProviderRegistry::WidgetMode::Embedded ) const override
     {
