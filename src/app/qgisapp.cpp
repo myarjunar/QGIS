@@ -293,7 +293,6 @@ Q_GUI_EXPORT extern int qt_defaultDpiX();
 #include "qgsuserprofile.h"
 
 #include "qgssublayersdialog.h"
-#include "geonode/qgsgeonodesourceselect.h"
 #include "ogr/qgsvectorlayersaveasdialog.h"
 
 #include "qgsosmdownloaddialog.h"
@@ -1050,11 +1049,6 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
     mActionShowPythonDialog = nullptr;
     mActionInstallFromZip = nullptr;
   }
-
-  // add geonode menu under web menu
-  addPluginToWebMenu( mGeonodeMenu->title(), mActionAddGeonodeLayer );
-  mActionAddGeonodeLayer = new QAction( tr( "Add GeoNode Layers..." ), this );
-  mGeonodeMenu->addAction( mActionAddGeonodeLayer );
 
   // Set icon size of toolbars
   if ( settings.contains( QStringLiteral( "IconSize" ) ) )
@@ -1900,8 +1894,6 @@ void QgisApp::createActions()
   connect( mActionLabeling, &QAction::triggered, this, &QgisApp::labeling );
   connect( mActionStatisticalSummary, &QAction::triggered, this, &QgisApp::showStatisticsDockWidget );
 
-  // Web Menu Items
-
   // Layer Menu Items
 
   connect( mActionDataSourceManager, &QAction::triggered, this, [ = ]() { dataSourceManager(); } );
@@ -1927,7 +1919,6 @@ void QgisApp::createActions()
   connect( mActionAddAmsLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "arcgismapserver" ) ); } );
   connect( mActionAddDelimitedText, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "delimitedtext" ) ); } );
   connect( mActionAddVirtualLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "virtual" ) ); } );
-  connect( mActionAddGeonodeLayer, &QAction::triggered, this, [ = ] { dataSourceManager( QStringLiteral( "geonode" ) ); } );
   connect( mActionOpenTable, &QAction::triggered, this, &QgisApp::attributeTable );
   connect( mActionOpenFieldCalc, &QAction::triggered, this, &QgisApp::fieldCalculator );
   connect( mActionToggleEditing, &QAction::triggered, this, [ = ] { toggleEditing(); } );
@@ -2202,12 +2193,6 @@ void QgisApp::createMenus()
   mPanelMenu->setObjectName( QStringLiteral( "mPanelMenu" ) );
   mToolbarMenu = new QMenu( tr( "Toolbars" ), this );
   mToolbarMenu->setObjectName( QStringLiteral( "mToolbarMenu" ) );
-
-  // Geonode Submenu
-  mGeonodeMenu = new QMenu( tr( "GeoNode" ), this );
-  mGeonodeMenu->setObjectName( QStringLiteral( "mGeonodeMenu" ) );
-  // Geonode Action
-  mActionAddGeonodeLayer = new QAction( tr( "Add GeoNode Layers..." ), this );
 
   // Get platform for menu layout customization (Gnome, Kde, Mac, Win)
   QDialogButtonBox::ButtonLayout layout =
