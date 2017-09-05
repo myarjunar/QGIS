@@ -893,8 +893,6 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     void sponsors();
     //! About QGIS
     void about();
-    //! Add a Geonode layer to the map
-    void addGeonodeLayer();
     //#ifdef HAVE_POSTGRESQL
     //! Add a databaselayer to the map
     void addDatabaseLayer();
