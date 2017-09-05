@@ -123,6 +123,7 @@ class QgsLayerStylingWidget;
 class QgsDiagramProperties;
 class QgsLocatorWidget;
 class QgsDataSourceManagerDialog;
+class QgsGeoCmsProviderRegistry;
 
 #include <QMainWindow>
 #include <QToolBar>
@@ -143,6 +144,7 @@ class QgsDataSourceManagerDialog;
 #include "qgsrasterminmaxorigin.h"
 #include "qgsmaplayeractionregistry.h"
 #include "qgsoptionswidgetfactory.h"
+#include "geocms/qgsgeocmsproviderregistry.h"
 
 #include "ui_qgisapp.h"
 #include "qgis_app.h"
@@ -2073,6 +2075,8 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     double mLastRenderTimeSeconds = 0;
     QTimer mRenderProgressBarTimer;
     QMetaObject::Connection mRenderProgressBarTimerConnection;
+
+    std::unique_ptr< QgsGeoCmsProviderRegistry > mGeoCmsProviderRegistry;
 
     friend class TestQgisAppPython;
 };
