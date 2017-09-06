@@ -1110,6 +1110,10 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
   QgsStyle::defaultStyle();
   endProfile();
 
+  startProfile( QStringLiteral( "Loading GeoCMS providers" ) );
+  mGeoCmsProviderRegistry.reset( new QgsGeoCmsProviderRegistry() );
+  endProfile();
+
   mSplash->showMessage( tr( "QGIS Ready!" ), Qt::AlignHCenter | Qt::AlignBottom );
 
   QgsMessageLog::logMessage( QgsApplication::showSettings(), QString(), QgsMessageLog::INFO );
@@ -1194,8 +1198,6 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
          );
   connect( QgsApplication::taskManager(), &QgsTaskManager::allTasksFinished, taskProgress, &QWinTaskbarProgress::hide );
 #endif
-
-  mGeoCmsProviderRegistry.reset( new QgsGeoCmsProviderRegistry() );
 
   // supposedly all actions have been added, now register them to the shortcut manager
   QgsGui::shortcutsManager()->registerAllChildren( this );
