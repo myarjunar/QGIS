@@ -28,9 +28,17 @@ class QgsBrowserDockWidget : QgsDockWidget
  \param parent parent widget
 %End
     ~QgsBrowserDockWidget();
-    void addFavoriteDirectory( const QString &favDir );
+
+    QgsBrowserModel *browserModel() const;
 %Docstring
-Add directory to favorites
+Get access to the browser model
+ :rtype: QgsBrowserModel
+%End
+
+
+    void setMenuProvider( QgsBrowserDockWidgetMenuProvider *menuProvider /Transfer/ );
+%Docstring
+Set provider for context menu. Takes ownership of the instance
 %End
 
   public slots:
@@ -41,19 +49,6 @@ Add layer at index
     void showContextMenu( QPoint );
 %Docstring
 Show context menu
-%End
-
-    void addFavorite();
-%Docstring
-Add current item to favorite
-%End
-    void addFavoriteDirectory();
-%Docstring
-Add directory from file dialog to favorite
-%End
-    void removeFavorite();
-%Docstring
-Remove from favorite
 %End
 
     void refresh();
@@ -90,18 +85,6 @@ Update project home directory
 %Docstring
 Add selected layers to the project
 %End
-    void showProperties();
-%Docstring
-Show the layer properties
-%End
-    void hideItem();
-%Docstring
-Hide current item
-%End
-    void toggleFastScan();
-%Docstring
-Toggle fast scan
-%End
 
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
 %Docstring
@@ -133,9 +116,32 @@ Connections changed in the browser
 Show event override
 %End
 
+  protected:
+
 };
 
+class QgsBrowserDockWidgetMenuProvider
+{
+%Docstring
+ Implementation of this interface can be implemented to allow QgsBrowserTreeView
+ instance to provide custom context menus (opened upon right-click).
 
+.. seealso:: QgsBrowserTreeView
+.. versionadded:: 3.0
+%End
+
+%TypeHeaderCode
+#include "qgsbrowserdockwidget.h"
+%End
+public:
+  virtual ~QgsBrowserDockWidgetMenuProvider();
+
+  virtual QMenu *createContextMenu( QgsDataItem *item ) = 0 /Factory/;
+%Docstring
+Return a newly created menu instance (or null pointer on error)
+ :rtype: QMenu
+%End
+};
 
 /************************************************************************
  * This file has been generated automatically from                      *
