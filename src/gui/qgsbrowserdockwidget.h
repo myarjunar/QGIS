@@ -25,6 +25,7 @@
 #include "qgsdockwidget.h"
 #include "qgsbrowserdockwidget_p.h"
 #include "qgis_gui.h"
+#include "qgsbrowserdockwidgetdefaultactions.h"
 #include <QSortFilterProxyModel>
 
 class QgsBrowserModel;
@@ -33,6 +34,8 @@ class QgsDockBrowserTreeView;
 class QgsLayerItem;
 class QgsDataItem;
 class QgsBrowserTreeFilterProxyModel;
+class QgsBrowserDockWidgetMenuProvider;
+class QgsBrowserDockWidgetDefaultActions;
 
 /**
  * \ingroup gui
@@ -51,21 +54,30 @@ class GUI_EXPORT QgsBrowserDockWidget : public QgsDockWidget, private Ui::QgsBro
       */
     explicit QgsBrowserDockWidget( const QString &name, QWidget *parent SIP_TRANSFERTHIS = nullptr );
     ~QgsBrowserDockWidget();
-    //! Add directory to favorites
-    void addFavoriteDirectory( const QString &favDir );
+
+    //! Get access to current data item
+    QgsDataItem *currentDataItem() const ;
+
+    //! Get access to the browser model
+    QgsBrowserModel *browserModel() const { return mModel; }
+    //! Get access to the browser proxy model
+    QgsBrowserTreeFilterProxyModel *proxyModel() const { return mProxyModel; } SIP_SKIP
+    //! Get access to the browser tree view
+    QgsDockBrowserTreeView *browserView() const { return mBrowserView; } SIP_SKIP
+
+    //! Get access to the default actions that may be used with the tree view
+    QgsBrowserDockWidgetDefaultActions *defaultActions() SIP_SKIP;
+
+    //! Set provider for context menu. Takes ownership of the instance
+    void setMenuProvider( QgsBrowserDockWidgetMenuProvider *menuProvider SIP_TRANSFER );
+    //! Return pointer to the context menu provider. May be null
+    QgsBrowserDockWidgetMenuProvider *menuProvider() const { return mMenuProvider; } SIP_SKIP
 
   public slots:
     //! Add layer at index
     void addLayerAtIndex( const QModelIndex &index );
     //! Show context menu
     void showContextMenu( QPoint );
-
-    //! Add current item to favorite
-    void addFavorite();
-    //! Add directory from file dialog to favorite
-    void addFavoriteDirectory();
-    //! Remove from favorite
-    void removeFavorite();
 
     //! Refresh browser view model (and view)
     void refresh();
@@ -85,12 +97,6 @@ class GUI_EXPORT QgsBrowserDockWidget : public QgsDockWidget, private Ui::QgsBro
 
     //! Add selected layers to the project
     void addSelectedLayers();
-    //! Show the layer properties
-    void showProperties();
-    //! Hide current item
-    void hideItem();
-    //! Toggle fast scan
-    void toggleFastScan();
 
     //! Selection has changed
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
@@ -124,6 +130,11 @@ class GUI_EXPORT QgsBrowserDockWidget : public QgsDockWidget, private Ui::QgsBro
     //! Settings prefix (the object name)
     QString settingsSection() { return objectName().toLower(); }
 
+  protected:
+    //! helper class with default actions. Lazily initialized.
+    QgsBrowserDockWidgetDefaultActions *mDefaultActions = nullptr;
+    //! Context menu provider. Owned by the view.
+    QgsBrowserDockWidgetMenuProvider *mMenuProvider = nullptr;
     QgsDockBrowserTreeView *mBrowserView = nullptr;
     QgsBrowserModel *mModel = nullptr;
     QgsBrowserTreeFilterProxyModel *mProxyModel = nullptr;
@@ -134,6 +145,20 @@ class GUI_EXPORT QgsBrowserDockWidget : public QgsDockWidget, private Ui::QgsBro
 
 };
 
+/** \ingroup gui
+ * Implementation of this interface can be implemented to allow QgsBrowserTreeView
+ * instance to provide custom context menus (opened upon right-click).
+ *
+ * \see QgsBrowserTreeView
+ * \since QGIS 3.0
+ */
+class GUI_EXPORT QgsBrowserDockWidgetMenuProvider
+{
+public:
+  virtual ~QgsBrowserDockWidgetMenuProvider() = default;
 
+  //! Return a newly created menu instance (or null pointer on error)
+  virtual QMenu *createContextMenu( QgsDataItem *item ) = 0 SIP_FACTORY;
+};
 
 #endif // QGSBROWSERDOCKWIDGET_H

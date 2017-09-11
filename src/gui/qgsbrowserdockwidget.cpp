@@ -40,6 +40,7 @@
 
 QgsBrowserDockWidget::QgsBrowserDockWidget( const QString &name, QWidget *parent )
   : QgsDockWidget( parent )
+  , mDefaultActions( nullptr )
   , mModel( nullptr )
   , mProxyModel( nullptr )
   , mPropertiesWidgetEnabled( false )
@@ -109,6 +110,26 @@ QgsBrowserDockWidget::~QgsBrowserDockWidget()
   settings.setValue( settingsSection() + "/propertiesWidgetHeight", mPropertiesWidgetHeight );
 }
 
+QgsDataItem *QgsBrowserDockWidget::currentDataItem() const
+{
+  QModelIndex index = mProxyModel->mapToSource( mBrowserView->currentIndex() );
+  QgsDataItem *item = mModel->dataItem( index );
+  return item;
+}
+
+QgsBrowserDockWidgetDefaultActions *QgsBrowserDockWidget::defaultActions()
+{
+  if ( !mDefaultActions )
+    mDefaultActions = new QgsBrowserDockWidgetDefaultActions( this );
+  return mDefaultActions;
+}
+
+void QgsBrowserDockWidget::setMenuProvider( QgsBrowserDockWidgetMenuProvider *menuProvider )
+{
+  delete mMenuProvider;
+  mMenuProvider = menuProvider;
+}
+
 void QgsBrowserDockWidget::showEvent( QShowEvent *e )
 {
   // delayed initialization of the model
@@ -154,54 +175,18 @@ void QgsBrowserDockWidget::showEvent( QShowEvent *e )
 
 void QgsBrowserDockWidget::showContextMenu( QPoint pt )
 {
+  QgsDebugMsg( " ASU HIJI " );
+  if ( !mMenuProvider )
+    return;
+
+  QgsDebugMsg( " ASU DUA " );
   QModelIndex index = mProxyModel->mapToSource( mBrowserView->indexAt( pt ) );
   QgsDataItem *item = mModel->dataItem( index );
   if ( !item )
     return;
 
-  QMenu *menu = new QMenu( this );
-
-  if ( item->type() == QgsDataItem::Directory )
-  {
-    QgsSettings settings;
-    QStringList favDirs = settings.value( QStringLiteral( "browser/favourites" ) ).toStringList();
-    bool inFavDirs = item->parent() && item->parent()->type() == QgsDataItem::Favorites;
-
-    if ( item->parent() && !inFavDirs )
-    {
-      // only non-root directories can be added as favorites
-      menu->addAction( tr( "Add as a Favorite" ), this, SLOT( addFavorite() ) );
-    }
-    else if ( inFavDirs )
-    {
-      // only favorites can be removed
-      menu->addAction( tr( "Remove Favorite" ), this, SLOT( removeFavorite() ) );
-    }
-    menu->addAction( tr( "Properties..." ), this, SLOT( showProperties() ) );
-    menu->addAction( tr( "Hide from Browser" ), this, SLOT( hideItem() ) );
-    QAction *action = menu->addAction( tr( "Fast Scan this Directory" ), this, SLOT( toggleFastScan() ) );
-    action->setCheckable( true );
-    action->setChecked( settings.value( QStringLiteral( "qgis/scanItemsFastScanUris" ),
-                                        QStringList() ).toStringList().contains( item->path() ) );
-  }
-  else if ( item->type() == QgsDataItem::Layer )
-  {
-    menu->addAction( tr( "Add Selected Layer(s) to Canvas" ), this, SLOT( addSelectedLayers() ) );
-    menu->addAction( tr( "Properties..." ), this, SLOT( showProperties() ) );
-  }
-  else if ( item->type() == QgsDataItem::Favorites )
-  {
-    menu->addAction( tr( "Add a Directory..." ), this, SLOT( addFavoriteDirectory() ) );
-  }
-
-  QList<QAction *> actions = item->actions();
-  if ( !actions.isEmpty() )
-  {
-    if ( !menu->actions().isEmpty() )
-      menu->addSeparator();
-    // add action to the menu
-    menu->addActions( actions );
-  }
+  QgsDebugMsg( " ASU TILU " );
+  QMenu *menu = mMenuProvider->createContextMenu( item );
 
   if ( menu->actions().isEmpty() )
   {
@@ -209,40 +194,8 @@ void QgsBrowserDockWidget::showContextMenu( QPoint pt )
     return;
   }
 
+  QgsDebugMsg( " ASU OPAT " );
   menu->popup( mBrowserView->mapToGlobal( pt ) );
-}
-
-void QgsBrowserDockWidget::addFavorite()
-{
-  QModelIndex index = mProxyModel->mapToSource( mBrowserView->currentIndex() );
-  QgsDataItem *item = mModel->dataItem( index );
-  if ( !item )
-    return;
-
-  QgsDirectoryItem *dirItem = dynamic_cast<QgsDirectoryItem *>( item );
-  if ( !dirItem )
-    return;
-
-  addFavoriteDirectory( dirItem->dirPath() );
-}
-
-void QgsBrowserDockWidget::addFavoriteDirectory()
-{
-  QString directory = QFileDialog::getExistingDirectory( this, tr( "Add directory to favorites" ) );
-  if ( !directory.isEmpty() )
-  {
-    addFavoriteDirectory( directory );
-  }
-}
-
-void QgsBrowserDockWidget::addFavoriteDirectory( const QString &favDir )
-{
-  mModel->addFavoriteDirectory( favDir );
-}
-
-void QgsBrowserDockWidget::removeFavorite()
-{
-  mModel->removeFavorite( mProxyModel->mapToSource( mBrowserView->currentIndex() ) );
 }
 
 void QgsBrowserDockWidget::refresh()
@@ -363,59 +316,6 @@ void QgsBrowserDockWidget::addSelectedLayers()
   }
 
   QApplication::restoreOverrideCursor();
-}
-
-void QgsBrowserDockWidget::hideItem()
-{
-  QModelIndex index = mProxyModel->mapToSource( mBrowserView->currentIndex() );
-  QgsDataItem *item = mModel->dataItem( index );
-  if ( ! item )
-    return;
-
-  if ( item->type() == QgsDataItem::Directory )
-  {
-    mModel->hidePath( item );
-  }
-}
-
-void QgsBrowserDockWidget::showProperties()
-{
-  QModelIndex index = mProxyModel->mapToSource( mBrowserView->currentIndex() );
-  QgsDataItem *item = mModel->dataItem( index );
-  if ( ! item )
-    return;
-
-  if ( item->type() == QgsDataItem::Layer || item->type() == QgsDataItem::Directory )
-  {
-    QgsBrowserPropertiesDialog *dialog = new QgsBrowserPropertiesDialog( settingsSection(), this );
-    dialog->setItem( item );
-    dialog->show();
-  }
-}
-
-void QgsBrowserDockWidget::toggleFastScan()
-{
-  QModelIndex index = mProxyModel->mapToSource( mBrowserView->currentIndex() );
-  QgsDataItem *item = mModel->dataItem( index );
-  if ( ! item )
-    return;
-
-  if ( item->type() == QgsDataItem::Directory )
-  {
-    QgsSettings settings;
-    QStringList fastScanDirs = settings.value( QStringLiteral( "qgis/scanItemsFastScanUris" ),
-                               QStringList() ).toStringList();
-    int idx = fastScanDirs.indexOf( item->path() );
-    if ( idx != -1 )
-    {
-      fastScanDirs.removeAt( idx );
-    }
-    else
-    {
-      fastScanDirs << item->path();
-    }
-    settings.setValue( QStringLiteral( "qgis/scanItemsFastScanUris" ), fastScanDirs );
-  }
 }
 
 void QgsBrowserDockWidget::showFilterWidget( bool visible )

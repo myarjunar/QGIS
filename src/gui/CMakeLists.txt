@@ -196,6 +196,7 @@ SET(QGIS_GUI_SRCS
   qgsblendmodecombobox.cpp
   qgsbrowsertreeview.cpp
   qgsbrowserdockwidget.cpp
+  qgsbrowserdockwidgetdefaultactions.cpp
   qgsbrowserdockwidget_p.cpp
   qgsbusyindicatordialog.cpp
   qgscharacterselectordialog.cpp
@@ -395,6 +396,7 @@ SET(QGIS_GUI_MOC_HDRS
   qgsdockwidget.h
   qgsbrowserdockwidget_p.h
   qgsbrowserdockwidget.h
+  qgsbrowserdockwidgetdefaultactions.h
   qgsencodingfiledialog.h
   qgserrordialog.h
   qgsexpressionbuilderdialog.h
