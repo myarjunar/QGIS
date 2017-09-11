@@ -121,14 +121,11 @@ void QgsBrowserDockWidgetDefaultActions::addLayer(QgsLayerItem *layerItem)
 
 void QgsBrowserDockWidgetDefaultActions::addSelectedLayers()
 {
-  QgsDebugMsg( " ASU LAYER " );
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
   // get a sorted list of selected indexes
   QModelIndexList list = mBrowserView->selectionModel()->selectedIndexes();
   std::sort( list.begin(), list.end() );
-
-  QgsDebugMsg( QString(" ASU LIST COUNT %1 ").arg( list.size() ) );
 
   // If any of the layer items are QGIS we just open and exit the loop
   Q_FOREACH ( const QModelIndex &index, list )

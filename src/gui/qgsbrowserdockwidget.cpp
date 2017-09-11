@@ -175,17 +175,14 @@ void QgsBrowserDockWidget::showEvent( QShowEvent *e )
 
 void QgsBrowserDockWidget::showContextMenu( QPoint pt )
 {
-  QgsDebugMsg( " ASU HIJI " );
   if ( !mMenuProvider )
     return;
 
-  QgsDebugMsg( " ASU DUA " );
   QModelIndex index = mProxyModel->mapToSource( mBrowserView->indexAt( pt ) );
   QgsDataItem *item = mModel->dataItem( index );
   if ( !item )
     return;
 
-  QgsDebugMsg( " ASU TILU " );
   QMenu *menu = mMenuProvider->createContextMenu( item );
 
   if ( menu->actions().isEmpty() )
@@ -194,7 +191,6 @@ void QgsBrowserDockWidget::showContextMenu( QPoint pt )
     return;
   }
 
-  QgsDebugMsg( " ASU OPAT " );
   menu->popup( mBrowserView->mapToGlobal( pt ) );
 }
 
