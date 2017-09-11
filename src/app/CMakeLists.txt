@@ -6,6 +6,7 @@ SET(QGIS_APP_SRCS
   qgisappstylesheet.cpp
   qgsabout.cpp
   qgsalignrasterdialog.cpp
+  qgsappbrowserdockwidgetmenuprovider.cpp
   qgsapplayertreeviewmenuprovider.cpp
   qgsaddattrdialog.cpp
   qgsaddtaborgroup.cpp
@@ -202,6 +203,7 @@ SET (QGIS_APP_MOC_HDRS
   qgsjoindialog.h
   qgsaddtaborgroup.h
   qgsannotationwidget.h
+  qgsappbrowserdockwidgetmenuprovider.h
   qgsapplayertreeviewmenuprovider.h
   qgsattributeactiondialog.h
   qgsattributeactionpropertiesdialog.h

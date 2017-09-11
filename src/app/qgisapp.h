@@ -623,6 +623,9 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     //! Returns the active map layer.
     QgsMapLayer *activeLayer();
 
+    //! Returns the active data item in the browser dock widget.
+    QgsDataItem *activeDataItem();
+
     /**
      * Returns the toolbar icon size. If \a dockedToolbar is true, the icon size
      * for toolbars contained within docks is returned.
@@ -749,6 +752,20 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
                                 (defaults to the active layer on the legend)
      */
     void pasteStyle( QgsMapLayer *destinationLayer = nullptr );
+    //! get style of the active data item (geonode layer item) to the clipboard
+
+    /**
+       \param sourceItem  The data item where the style will be taken from
+                                        (defaults to the active data item on the browser dock widget)
+     */
+    void getStyle( QgsDataItem *sourceItem = nullptr );
+    //! push style on the clipboard to the active data item (geonode layer item)
+
+    /**
+       \param destinationItem  The data item that the clipboard will be pasted to
+                                (defaults to the active data item on the browser dock widget)
+     */
+//    void pushStyle( QgsDataItem *destinationItem = nullptr );
 
     //! copies features to internal clipboard
     void copyFeatures( QgsFeatureStore &featureStore );

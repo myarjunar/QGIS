@@ -123,6 +123,7 @@ Q_GUI_EXPORT extern int qt_defaultDpiX();
 #include "qgisplugin.h"
 #include "qgsabout.h"
 #include "qgsalignrasterdialog.h"
+#include "qgsappbrowserdockwidgetmenuprovider.h"
 #include "qgsapplayertreeviewmenuprovider.h"
 #include "qgsapplication.h"
 #include "qgsactionmanager.h"
@@ -174,6 +175,8 @@ Q_GUI_EXPORT extern int qt_defaultDpiX();
 #include "qgsfieldformatter.h"
 #include "qgsfieldformatterregistry.h"
 #include "qgsformannotation.h"
+#include "qgsgeonodeconnection.h"
+#include "qgsgeonoderequest.h"
 #include "qgsguiutils.h"
 #include "qgshtmlannotation.h"
 #include "qgsprojectionselectiondialog.h"
@@ -899,6 +902,7 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
 
   mBrowserWidget = new QgsBrowserDockWidget( tr( "Browser Panel" ), this );
   mBrowserWidget->setObjectName( QStringLiteral( "Browser" ) );
+  mBrowserWidget->setMenuProvider( new QgsAppBrowserDockWidgetMenuProvider( mBrowserWidget ) );
   addDockWidget( Qt::LeftDockWidgetArea, mBrowserWidget );
   mBrowserWidget->hide();
   connect( this, &QgisApp::newProject, mBrowserWidget, &QgsBrowserDockWidget::updateProjectHome );
@@ -909,6 +913,7 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipVersionCh
 
   mBrowserWidget2 = new QgsBrowserDockWidget( tr( "Browser Panel (2)" ), this );
   mBrowserWidget2->setObjectName( QStringLiteral( "Browser2" ) );
+  mBrowserWidget2->setMenuProvider( new QgsAppBrowserDockWidgetMenuProvider( mBrowserWidget2 ) );
   addDockWidget( Qt::LeftDockWidgetArea, mBrowserWidget2 );
   mBrowserWidget2->hide();
   connect( this, &QgisApp::newProject, mBrowserWidget2, &QgsBrowserDockWidget::updateProjectHome );
@@ -8274,6 +8279,50 @@ void QgisApp::pasteStyle( QgsMapLayer *destinationLayer )
   }
 }
 
+void QgisApp::getStyle(QgsDataItem *sourceItem)
+{
+  QgsDataItem *selectedItem = sourceItem ? sourceItem : activeDataItem();
+
+  if ( selectedItem )
+  {
+    QgsLayerItem *layerItem = dynamic_cast<QgsLayerItem *>( selectedItem );
+    QString layerUri = layerItem->uri();
+
+    QgsGeoNodeConnection *connection = nullptr;
+    Q_FOREACH ( const QString &connName, QgsGeoNodeConnectionUtils::connectionList() )
+    {
+      connection = new QgsGeoNodeConnection( connName );
+      if ( layerUri.contains( connection->uri().uri() ) )
+        break;
+    }
+
+    if ( !connection )
+    {
+      QString errorMsg( QStringLiteral( "Cannot get style for layer %1" ).arg( selectedItem->name() ) );
+      messageBar()->pushMessage( tr( "Cannot copy style" ),
+                                 errorMsg,
+                                 QgsMessageBar::CRITICAL, messageTimeout() );
+      return;
+    }
+
+    QString url( connection->uri().encodedUri() );
+    QgsGeoNodeRequest geoNodeRequest( url.replace( QStringLiteral( "url=" ), QStringLiteral( "" ) ), true );
+    QgsGeoNodeStyle style = geoNodeRequest.fetchDefaultStyleBlocking( selectedItem->name() );
+    if ( style.name.isEmpty() )
+    {
+      QString errorMsg( QStringLiteral( "Cannot get style for layer %1" ).arg( selectedItem->name() ) );
+      messageBar()->pushMessage( tr( "Cannot copy style" ),
+                                 errorMsg,
+                                 QgsMessageBar::CRITICAL, messageTimeout() );
+      return;
+    }
+    // Copies data in text form as well, so the XML can be pasted into a text editor
+    clipboard()->setData( QGSCLIPBOARD_STYLE_MIME, style.body.toByteArray(), style.body.toString() );
+    // Enables the paste menu element
+    mActionPasteStyle->setEnabled( true );
+  }
+}
+
 void QgisApp::copyFeatures( QgsFeatureStore &featureStore )
 {
   clipboard()->replaceWithCopyOf( featureStore );
@@ -9750,6 +9799,11 @@ void QgisApp::unregisterOptionsWidgetFactory( QgsOptionsWidgetFactory *factory )
 QgsMapLayer *QgisApp::activeLayer()
 {
   return mLayerTreeView ? mLayerTreeView->currentLayer() : nullptr;
+}
+
+QgsDataItem* QgisApp::activeDataItem()
+{
+  return mBrowserWidget ? mBrowserWidget->currentDataItem() : nullptr;
 }
 
 QSize QgisApp::iconSize( bool dockedToolbar ) const
